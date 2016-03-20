@@ -2,6 +2,7 @@ import numpy as np
 import wave
 import pyaudio
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 class Synth():
 
@@ -42,16 +43,35 @@ class Synth():
 		
 		self.playSignal(ssignal)
 
+	
+
 	def visualize(self):
-		l = len(self.totalsignal)
-		xLen = l
-		x = np.arange(int(xLen))
-		y = [s for s in self.totalsignal]
-		y = y[:len(x)]
+
+		def animate(i):
+			l = len(self.totalsignal)
+			x = np.arange(int(l))
+			y = [s for s in self.totalsignal]
+			y = y[:len(x)]
+			xs = []
+			ys = []
+			for n in range(l):
+				xs.append(x[n])
+				ys.append(y[n])
+			ax.clear()
+			ax.plot(xs, ys)
+
+		# l = len(self.totalsignal)
+		# xLen = l
+		# x = np.arange(int(xLen))
+		# y = [s for s in self.totalsignal]
+		# y = y[:len(x)]
 		fig = plt.figure()
 		ax = fig.add_subplot(211)
-		line1 = ax.plot(x, y)
+		# line1 = ax.plot(x, y)
+		ani = animation.FuncAnimation(fig, animate, interval=1000)
 		plt.show()
+
+
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		self.stream.stop_stream()
