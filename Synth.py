@@ -41,8 +41,8 @@ class Synth():
 		   self.totalsignal.append(signal[i] / self.volume)
 		   ssignal += wave.struct.pack('h',signal[i])
 		
-		self.playSignal(ssignal)
-
+		# self.playSignal(ssignal)
+		return ssignal
 	
 
 	def visualize(self):
