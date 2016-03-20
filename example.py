@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from basic_units import radians, degrees, cos
 import pyaudio
 
+p = pyaudio.PyAudio()
 
 class SoundFile:
    def  __init__(self, signal, duration, samplerate):
@@ -23,14 +24,14 @@ class SoundFile:
 # let's prepare a signal
 volume =  16384
 A = 1
-duration = 3 # seconds
+duration = 2 # seconds
 #number of samples of audio carried per second. 44.1 kHz is the sampling rate of audio CDs
 #20 kHz is the highest frequency audible by humans
 samplerate = 44100 # Hz
 #amount of samples needed to fill n seconds of audio
 samples = duration*samplerate
-#number of phases (cycles) per second
-frequency = 440 # Hz
+#number of    phases (cycles) per second
+frequency = 261.63 # Hz
 
 # sine wave has a phaseic form which repeats every T seconds
 phase = samplerate / float(frequency) # in sample points
@@ -42,9 +43,9 @@ omega = N.pi * 2 / phase
 period = N.arange(int(phase),dtype = N.float) * omega
 
 #sin wave
-# y = A * N.sin(period)
+y = A * N.sin(period)
 #sawtooth wave
-y = A - ((A / N.pi) * period)
+# y = A - ((A / N.pi) * period)
 
 ydata = volume * y
 
@@ -53,29 +54,30 @@ ydata = volume * y
 #The command then fills it with repeated copies of the ydata
 signal = N.resize(ydata, (samples,))
 
+stream = p.open(format=8,
+                channels=1,
+                rate=samplerate,
+                output=True)
+
 ssignal = ''
 for i in range(len(signal)):
    ssignal += wave.struct.pack('h',signal[i]) # transform to binary
 
-f = SoundFile(ssignal,duration,samplerate)
-f.write()
+# f = SoundFile(ssignal,duration,samplerate)
+# f.write()
 
 
-PyAudio = pyaudio.PyAudio
-p = PyAudio()
-stream = p.open(format = p.get_format_from_width(1), 
-                channels = 1, 
-                rate = samplerate, 
-                output = True)
+x = [val*radians for val in period]
+fig = plt.figure()
+ax = fig.add_subplot(211)
+line1 = ax.plot(x, y, xunits=radians)
+plt.show()
 
-stream.write(signal)
+
+stream.write(ssignal)
+
 stream.stop_stream()
 stream.close()
+
 p.terminate()
 
-
-# x = [val*radians for val in period]
-# fig = plt.figure()
-# ax = fig.add_subplot(211)
-# line1 = ax.plot(x, y, xunits=radians)
-# plt.show()
