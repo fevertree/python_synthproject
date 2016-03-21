@@ -44,14 +44,12 @@ class Synth():
 		return ssignal
 
 	def genChord(self,notes, duration,type):
-
 		notedata = []
-
 		for note in notes:
 			signal = self.genNote(note,duration*2,type)
 			decodeddata = np.fromstring(signal, np.int16)
 			notedata.append(decodeddata * 0.5)
-
+			
 		return sum(notedata).astype(np.int16)
 
 	def visualize(self):
@@ -79,8 +77,6 @@ class Synth():
 		# line1 = ax.plot(x, y)
 		ani = animation.FuncAnimation(fig, animate, interval=1000)
 		plt.show()
-
-
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		self.stream.stop_stream()
