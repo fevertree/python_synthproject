@@ -41,9 +41,18 @@ class Synth():
 		   self.totalsignal.append(signal[i] / self.volume)
 		   ssignal += wave.struct.pack('h',signal[i])
 		
-		# self.playSignal(ssignal)
 		return ssignal
-	
+
+	def genChord(self,notes, duration,type):
+
+		notedata = []
+
+		for note in notes:
+			signal = self.genNote(note,duration*2,type)
+			decodeddata = np.fromstring(signal, np.int16)
+			notedata.append(decodeddata * 0.5)
+
+		return sum(notedata).astype(np.int16)
 
 	def visualize(self):
 
