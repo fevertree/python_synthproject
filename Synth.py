@@ -3,16 +3,19 @@ import wave
 import pyaudio
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import Music
 
 class Synth():
 
-	def __init__(self):
+	def __init__(self,tempo):
 		self.volume = 16384
 		self.samplerate = 44100
 		self.p = pyaudio.PyAudio()
 		self.stream = self.p.open(format=8,channels=1,rate=self.samplerate,output=True)
-		self.notes = {"C":261.63, "D":293.66, "E":329.63, "F":349.23, "G":392.0,"A":440.0, "B":493.88}
 		self.totalsignal = []
+		self.m = Music.Music()
+		self.tempo = tempo
+		self.BPS = 60 / tempo
 
 	def __enter__(self):
 		return self
@@ -20,9 +23,10 @@ class Synth():
 	def playSignal(self, signal):
 		self.stream.write(signal)
 
-	def genNote(self,note,duration,type):
+	def genNote(self,note,beats,type):
+		duration = self.BPS * beats
+		frequency = self.m.returnFreq(note)
 		A = 1
-		frequency = self.notes[note]
 		samples = duration*self.samplerate
 		phase = self.samplerate / float(frequency)
 		omega = np.pi * 2 / phase
@@ -43,7 +47,7 @@ class Synth():
 		
 		return ssignal
 
-	def genChord(self,notes, duration,type):
+	def genChord(self,notes,duration,type):
 		notedata = []
 		for note in notes:
 			signal = self.genNote(note,duration*2,type)
