@@ -15,7 +15,7 @@ class Synth():
 		self.totalsignal = []
 		self.m = Music.Music()
 		self.tempo = tempo
-		self.BPS = 60 / tempo
+		self.BPS = 60.0 / tempo
 
 	def __enter__(self):
 		return self
@@ -25,16 +25,22 @@ class Synth():
 
 	def genNote(self,note,beats,type):
 		duration = self.BPS * beats
-		frequency = self.m.returnFreq(note)
+		if len(note) > 0:
+			frequency = self.m.returnFreq(note)
+			phase = self.samplerate / float(frequency)
+			omega = np.pi * 2 / phase
+		else:
+			frequency = 0
+			phase = 0
+			omega = 0
 		A = 1
+		
 		samples = duration*self.samplerate
-		phase = self.samplerate / float(frequency)
-		omega = np.pi * 2 / phase
 		period = np.arange(int(phase),dtype = np.float) * omega
 
 		if type == "sin":
 			y = A * np.sin(period)
-		if type == "saw":
+		elif type == "saw":
 			y = A - ((A / np.pi) * period)
 
 		ydata = self.volume * y
@@ -46,6 +52,7 @@ class Synth():
 		   ssignal += wave.struct.pack('h',signal[i])
 		
 		return ssignal
+
 
 	def genChord(self,notes,duration,type):
 		notedata = []
