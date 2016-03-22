@@ -78,15 +78,32 @@ class Synth():
 		return signalObject
 
 	def visualize(self):
-		xdata = []
+
+		fig, ax = plt.subplots()
+		ax.set_ylim(-6, 6)
+
 		ydata = []
 		for i in range(len(self.totalsignal)):
-			xdata.append(i)
 			ydata.append(self.totalsignal[i])
+		# xdata = np.arange(len(ydata))
 
-		fig = plt.figure()
-		ax = fig.add_subplot(211)
-		line1 = ax.plot(xdata, ydata)
+		x = np.arange(1000)
+		line, = ax.plot(x, ydata[0:1000])
+
+		def animate(i):
+			if 1000*i+1000 > len(ydata):
+				pass
+			else:
+				line.set_ydata(ydata[1000*i:1000*i+1000])
+  				return line,
+		def init():
+			line.set_ydata(np.ma.array(x, mask=True))
+	 		return line,
+
+	 	frames = len(ydata) /1000
+
+		ani = animation.FuncAnimation(fig, animate,frames, init_func=init,
+		                              interval=100, blit=True,repeat = True)
 		plt.show()
 
 
