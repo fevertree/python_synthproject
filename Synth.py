@@ -4,6 +4,7 @@ import pyaudio
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import Music
+import Signal
 
 class Synth():
 
@@ -16,14 +17,20 @@ class Synth():
 		self.m = Music.Music()
 		self.tempo = tempo
 		self.BPS = 60.0 / tempo
+		# self.signalLog = open("signalLog.txt", 'r+')
+		self.frameCounter = 0
 
 	def __enter__(self):
 		return self
 
 	def playSignal(self, signal):
-		self.stream.write(signal)
+		for s in signal.signalData:
+			self.totalsignal.append(s)
+		self.stream.write(signal.binary)
 
 	def genNote(self,note,beats,type):
+		signalObject = Signal.Signal()
+
 		duration = self.BPS * beats
 		if len(note) > 0:
 			frequency = self.m.returnFreq(note)
@@ -34,7 +41,7 @@ class Synth():
 			phase = 0
 			omega = 0
 		A = 1
-		
+
 		samples = duration*self.samplerate
 		period = np.arange(int(phase),dtype = np.float) * omega
 
@@ -47,51 +54,48 @@ class Synth():
 		signal = np.resize(ydata, (samples,))
 
 		ssignal = ''
-		for i in range(len(signal)):
-		   self.totalsignal.append(signal[i] / self.volume)
-		   ssignal += wave.struct.pack('h',signal[i])
-		
-		return ssignal
 
+		for i in range(len(signal)):
+		   	signalObject.signalData.append(signal[i] / self.volume)
+		   	signalObject.binary += wave.struct.pack('h',signal[i])
+		
+		return signalObject
 
 	def genChord(self,notes,duration,type):
+		signalObject = Signal.Signal()
 		notedata = []
+		signalDatas = []
+
 		for note in notes:
 			signal = self.genNote(note,duration*2,type)
-			decodeddata = np.fromstring(signal, np.int16)
+			signalDatas.append(signal.signalData)
+			decodeddata = np.fromstring(signal.binary, np.int16)
 			notedata.append(decodeddata * 0.5)
-			
-		return sum(notedata).astype(np.int16)
+
+		signalObject.signalData = sum(map(np.array, signalDatas))
+		signalObject.binary = sum(notedata).astype(np.int16)
+
+		return signalObject
 
 	def visualize(self):
+		xdata = []
+		ydata = []
+		for i in range(len(self.totalsignal)):
+			xdata.append(i)
+			ydata.append(self.totalsignal[i])
 
-		def animate(i):
-			l = len(self.totalsignal)
-			x = np.arange(int(l))
-			y = [s for s in self.totalsignal]
-			y = y[:len(x)]
-			xs = []
-			ys = []
-			for n in range(l):
-				xs.append(x[n])
-				ys.append(y[n])
-			ax.clear()
-			ax.plot(xs, ys)
-
-		# l = len(self.totalsignal)
-		# xLen = l
-		# x = np.arange(int(xLen))
-		# y = [s for s in self.totalsignal]
-		# y = y[:len(x)]
 		fig = plt.figure()
 		ax = fig.add_subplot(211)
-		# line1 = ax.plot(x, y)
-		ani = animation.FuncAnimation(fig, animate, interval=1000)
+		line1 = ax.plot(xdata, ydata)
 		plt.show()
+
+
+
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		self.stream.stop_stream()
 		self.stream.close()
 		self.p.terminate()
+		# self.signalLog.close()
 
 

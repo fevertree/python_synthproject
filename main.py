@@ -1,6 +1,7 @@
 from Synth import Synth
 import numpy as np
 from Music import Music
+import Signal
 
 #sepapoisid
 
@@ -11,9 +12,9 @@ Cmaj = m.returnMajorScale("C",4)
 with Synth(100.0) as syn1:
 	# syn1.visualize()
 
-	# C = syn1.genNote("C",0.5,"saw")
-	# E = syn1.genNote("E",0.5,"saw")
-	# G = syn1.genNote("G",0.5,"saw")
+	# C = syn1.genNote("C",0.25,"saw")
+	# E = syn1.genNote("E",0.25,"saw")
+	# G = syn1.genNote("G",0.25,"saw")
 	# cMaj = syn1.genChord(["C","E","G"],1,"saw")
 
 	# syn1.playSignal(C)
@@ -41,6 +42,8 @@ with Synth(100.0) as syn1:
 	syn1.playSignal(fourth)
 	syn1.playSignal(threeFourthsPause)
 	syn1.playSignal(fifth)
+
+	syn1.visualize()
 
 
 	# for note in Cmaj:
