@@ -107,7 +107,24 @@ class Synth():
 		plt.show()
 
 
+	def playSong(self, song):
 
+		generatedNotes = {}
+
+		for note in song:
+			noteList = note.split(' ')
+			if noteList[0] == 'pause':
+				if note not in generatedNotes:
+					generatedNotes[note] = self.genNote("",float(noteList[-1]),"saw")
+			elif len(noteList) == 2:
+				if note not in generatedNotes:
+					generatedNotes[note] = self.genNote(noteList[0],float(noteList[-1]),"saw")
+			else:
+				if note not in generatedNotes:
+					generatedNotes[note] = self.genChord(noteList[:len(noteList)-1],float(noteList[-1]),"saw")
+
+		for note in song:
+			self.playSignal(generatedNotes[note])
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		self.stream.stop_stream()
