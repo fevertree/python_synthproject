@@ -24,11 +24,15 @@ class Synth():
 		return self
 
 	def playSignal(self, signal):
+		"""Writes an audiowave converted into binary into the open stream to be played"""
 		for s in signal.signalData:
-			self.totalsignal.append(s)
+			self.totalsignal.append(s) # for visualization of the stream later on
 		self.stream.write(signal.binary)
 
 	def genNote(self,note,beats,type):
+		"""Generates a signal object that includes the audio wave
+		converted into binary and the raw audio wave data (y coordinates for a wave
+		function) for a specific note, duration and wave type"""
 		signalObject = Signal.Signal()
 
 		duration = self.BPS * beats
@@ -62,6 +66,8 @@ class Synth():
 		return signalObject
 
 	def genChord(self,notes,duration,type):
+		"""Generates a chord by first generating the individual notes, then halving the amplitudes of
+		the resulting wave functions of the notes and then adding them all together"""
 		signalObject = Signal.Signal()
 		notedata = []
 		signalDatas = []
@@ -78,7 +84,7 @@ class Synth():
 		return signalObject
 
 	def visualize(self):
-
+		"""Shows the audio wave of the stream in a matplotlib graph"""
 		fig, ax = plt.subplots()
 		ax.set_ylim(-6, 6)
 
@@ -108,6 +114,7 @@ class Synth():
 
 
 	def playSong(self, song):
+		"""Generates notes, chords or pauses according to transcribed notation and plays it"""
 
 		generatedNotes = {}
 

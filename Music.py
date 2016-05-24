@@ -9,8 +9,11 @@ class Music():
 		octaves = 8
 
 	def returnFreq(self, note):
+		"""Returns the frequency for a specified note in a specified octave. Defaults to the
+		4th octave if not specified."""
 
 		def hasOctave(inputString):
+			"""Checks if the inputted note has an octave specified"""
 			return any(char.isdigit() for char in inputString)
 
 		if hasOctave(note):
@@ -27,6 +30,7 @@ class Music():
 		return self.f0 * math.pow(self.a,halfTones)
 
 	def returnMajorScale(self,parallelKey,octave):
+		"""Returns a list of notes for a specified major scale and octave"""
 		oc = octave
 		notes = []
 		notes.append("%s%s" % (parallelKey, str(oc))) 
